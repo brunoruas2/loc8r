@@ -3,7 +3,7 @@ const router = express.Router();
 
 // GET 'homelist' page
 const homelist = (req, res) => {
-    res.render('index', { title: 'Home' });
+    res.render('locations-list', { title: 'Locations' });
 };
 
 // GET 'Location info' page

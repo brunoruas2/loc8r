@@ -1,5 +1,26 @@
 const mongoose = require('mongoose');
 const readLine = require('readline');
+require('../controllers/locations');
+
+// Creating a conecction
+const dbURI = 'mongodb://localhost/Loc8r';
+mongoose.connect(dbURI, {useNewUrlParser: true, useUnifiedTopology: true});
+
+// Monitors for a successful connection through Mongoose
+mongoose.connection.on('connected', () => {
+  console.log(`Mongoose connected to ${dbURI}`)
+});
+
+// Checks for a connection error
+mongoose.connection.on('error', err => {
+  console.log(`Mongoose connection error:`, err)
+});
+
+// Checks for a disconnection event
+mongoose.connection.on('disconnected', () => {
+  console.log(`Mongoose disconnected`)
+});
+
 
 // Listening for SIGINT to monitor whan the aplication stops
 // npm start
@@ -33,21 +54,31 @@ if (process.platform === 'win32') {
   });
 }
 
-// Creating a conecction
-const dbURI = 'mongodb://localhost/Loc8r';
-mongoose.connect(dbURI, {useNewUrlParser: true, useUnifiedTopology: true});
+// Capturing the process termination events
+const gracefulShutdown = (msg, callback) => {
+  mongoose.connection.close( () => {
+    console.log(`Mongoose disconnected through ${msg}`);
+    callback();
+  })
+}
 
-// Monitors for a successful connection through Mongoose
-mongoose.connection.on('connected', () => {
-  console.log(`Mongoose connected to ${dbURI}`)
+// Nodemon
+process.once('SIGUSR2', () => {
+  gracefulShutdown('nodemon restart', () => {
+    process.kill(process.pid, 'SIGUSR2');
+  });
 });
 
-// Checks for a connection error
-mongoose.connection.on('error', err => {
-  console.log(`Mongoose connection error:`, err)
+// NPM start
+process.once('SIGINT', () => {
+  gracefulShutdown('app termination', () => {
+    process.exit(0);
+  });
 });
 
-// Checks for a disconnection event
-mongoose.connection.on('disconnected', () => {
-  console.log(`Mongoose disconnected`)
+// Heroku
+process.once('SIGTERM', () => {
+  gracefulShutdown('Heroku app shutdown', () => {
+    process.exit(0);
+  });
 });

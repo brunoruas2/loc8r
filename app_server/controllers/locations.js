@@ -1,5 +1,59 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
+
+// DATABASE
+// subdocument
+const openingTimeSchema = new mongoose.Schema({
+    days:{
+        type:String,
+        required:true
+    },
+    opening:String,
+    closing:String,
+    closed:{
+        type:Boolean,
+        required:true
+    }
+});
+// subdocument
+const reviewSchema = new mongoose.Schema({
+    author: String,
+    rating: {
+        type:Number,
+        required:true,
+        min:0,
+        max:5
+    },
+    reviewText:String,
+    createdOn:{
+        type:Date,
+        'default':Date.now
+    }
+});
+// document
+const locationSchema = new mongoose.Schema({
+    name:{
+        type:String,
+        required: true},
+    address:String,
+    rating:{
+        type:Number,
+        'default': 0,
+        min: 0,
+        max: 5},
+    facilities:[String],
+    coods:{
+        type:{ type: String },
+        coordinates: [Number]
+    },
+    openingTimes: [openingTimeSchema],
+    reviews: [reviewSchema]
+});
+locationSchema.index({coords: '2dsphere'});
+
+// Compiling a Model from a Schema
+mongoose.model('Location', locationSchema);
 
 // GET 'homelist' page - ok
 const homelist = (req, res) => {
@@ -48,7 +102,7 @@ const locationInfo = (req, res) => {
             address:'125 High Street, Reading, RG6 1PS',
             rating:4,
             facilities:['Hot drinks','Food','Premium Wifi'],
-            coords:'iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15936.768750392297!2d-60.02027928829196!3d-3.043106171570461!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c1a1055f67251%3A0x9ae77ab416b67309!2sHappy%20Day%20Futebol%20Society!5e0!3m2!1spt-PT!2sbr!4v1587870062455!5m2!1spt-PT!2sbr" width="100%" height="238" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"',
+            coords:'iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15936.768750392297!2d-60.02027928829196!3d-3.043106171570461!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c1a1055f67251%3A0x9ae77ab416b67309!2sHappy%20Day%20Futebol%20Society!5e0!3m2!1spt-PT!2sbr!4v1587870062455!5m2!1spt-PT!2sbr" width="100%" height="270" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"',
             openingTimes: [{
                 days: 'Monday- Friday',
                 opening: '7:00am',

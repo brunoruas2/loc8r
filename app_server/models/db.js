@@ -4,7 +4,9 @@ require('../controllers/locations');
 
 // Creating a conecction
 const dbURI = 'mongodb://localhost/Loc8r';
-mongoose.connect(dbURI, {useNewUrlParser: true, useUnifiedTopology: true});
+if (process.env.NODE_ENV === 'production') {
+  dbURI = process.env.MLAB_URI;
+}
 
 // Monitors for a successful connection through Mongoose
 mongoose.connection.on('connected', () => {

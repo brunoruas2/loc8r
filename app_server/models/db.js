@@ -4,7 +4,7 @@ require('../controllers/locations');
 
 // Creating a conecction
 
-const dbURI = 'mongodb://localhost/Loc8r';
+let dbURI = 'mongodb://localhost/Loc8r';
 if (process.env.NODE_ENV === 'production') {
   dbURI = process.env.MLAB_URI;
 }

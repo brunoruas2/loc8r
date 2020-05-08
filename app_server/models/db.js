@@ -6,13 +6,15 @@ require('../controllers/locations');
 /**
 let dbURI = 'mongodb://localhost/Loc8r';
 if (process.env.NODE_ENV === 'production') {
-  dbURI = process.env.MLAB_URI;
+  dbURI = process.env.MONGODB_URI;
 }
-*/
+
+const dbURI = "mongodb://bruno.ruas:conecta135@10.10.5.41/test";
+mongoose.connect(dbURI, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const dbURI = "mongodb+srv://app:datascience135@loc8r-w0grw.gcp.mongodb.net/test";
 mongoose.connect(dbURI, {useNewUrlParser: true, useUnifiedTopology: true});
-
+*/
 
 // Monitors for a successful connection through Mongoose
 mongoose.connection.on('connected', () => {

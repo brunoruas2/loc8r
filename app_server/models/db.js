@@ -3,12 +3,12 @@ const readLine = require('readline');
 require('../controllers/locations');
 
 // Creating a conecction
-/**
 let dbURI = 'mongodb://localhost/Loc8r';
 if (process.env.NODE_ENV === 'production') {
   dbURI = process.env.MONGODB_URI;
 }
 
+/**
 const dbURI = "mongodb://bruno.ruas:conecta135@10.10.5.41/test";
 mongoose.connect(dbURI, {useNewUrlParser: true, useUnifiedTopology: true});
 

@@ -3,12 +3,16 @@ const readLine = require('readline');
 require('../controllers/locations');
 
 // Creating a conecction
-let dbURI = 'mongodb://localhost/Loc8r';
+let dbURI = 'mongodb+srv://app:datascience135@loc8r-w0grw.gcp.mongodb.net/test';
+
 let a = (process.env.NODE_ENV)
 let b = (process.env.MONGODB_URI)
 
-if (a === 'web') {
-  dbURI = b;
+console.log(a)
+console.log(b)
+
+if (a === 'local') {
+  dbURI = 'mongodb://localhost/Loc8r';;
 }
 if (a === 'intranet') {
   dbURI = "mongodb://bruno.ruas:conecta135@10.10.5.41/test";

@@ -12,10 +12,7 @@ console.log(b)
 let dbURI = b;
 
 if (a === undefined) {
-  dbURI = 'mongodb://localhost/Loc8r';;
-}
-if (a === 'intranet') {
-  dbURI = "mongodb://bruno.ruas:conecta135@10.10.5.41";
+  dbURI = "mongodb://bruno.ruas:conecta135@10.10.5.41/Loc8r";
 }
 
 mongoose.connect(dbURI, {useNewUrlParser: true, useUnifiedTopology: true});

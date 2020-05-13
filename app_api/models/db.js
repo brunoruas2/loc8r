@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const readLine = require('readline');
-require('../controllers/locations');
+require('./locations');
 
 // Creating a conecction
 let a = (process.env.NODE_ENV)
@@ -15,6 +15,10 @@ if (a === undefined) {
   dbURI = "mongodb://bruno.ruas:conecta135@10.10.5.41/Loc8r";
 }
 
+// Fixing the DeprecationWarning about collection.ensureIndex
+mongoose.set('useCreateIndex', true);
+
+// Connecting
 mongoose.connect(dbURI, {useNewUrlParser: true, useUnifiedTopology: true});
 
 // Monitors for a successful connection through Mongoose

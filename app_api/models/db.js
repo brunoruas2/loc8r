@@ -6,8 +6,8 @@ require('./locations');
 let a = (process.env.NODE_ENV)
 let b = (process.env.MONGODB_URI)
 
-console.log(a)
-console.log(b)
+console.log("NODE_ENV setted to -> " + a)
+console.log("MONGODB_URI setted to -> " + b)
 
 let dbURI = b;
 

@@ -6,8 +6,8 @@ const apiOptions = {
     server: 'http://localhost:3000'
   };
   if (process.env.NODE_ENV === 'web') {
-    apiOptions.server = 'http://localhost:5000';
-    // apiOptions.server = 'https://stormy-eyrie-13476.herokuapp.com/';
+    // apiOptions.server = 'http://localhost:5000';
+    apiOptions.server = 'https://stormy-eyrie-13476.herokuapp.com/';
   }
 
 console.log("app_server connected to -> " + apiOptions.server)

@@ -14,9 +14,13 @@ const openingTimeSchema = new mongoose.Schema({
         required:true
     }
 });
+
 // subdocument
 const reviewSchema = new mongoose.Schema({
-    author: String,
+    author: {
+        type: String,
+        required: true
+    },
     rating: {
         type:Number,
         required:true,
@@ -29,6 +33,7 @@ const reviewSchema = new mongoose.Schema({
         'default':Date.now
     }
 });
+
 // document
 const locationSchema = new mongoose.Schema({
     name:{

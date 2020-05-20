@@ -6,7 +6,7 @@ const apiOptions = {
     server: 'http://localhost:3000'
   };
   if (process.env.NODE_ENV === 'web') {
-    apiOptions.server = 'http://localhost:5000'; 
+    apiOptions.server = 'http://localhost:5000';
     // apiOptions.server = 'https://stormy-eyrie-13476.herokuapp.com/';
   }
 
@@ -24,11 +24,37 @@ const showError = (req, res, status) => {
         content = 'Something, somewhere, has gone just a little bit wrong.'
     }
     res.status(status);
-
     res.render('generic-text', {
         title,
         content
     });
+};
+
+//------------------------------- Location info to use --------------------------------
+const getLocationInfo = (req, res, callback) => {
+    const path = `/api/locations/${req.params.locationid}`;
+    const requestOptions = {
+        url : `${apiOptions.server}${path}`,
+        method : "GET",
+        json : {}
+    };
+    request(
+        requestOptions,
+        (err, {statusCode}, body) => {
+            let data = body;
+            if (statusCode == 200) {
+                data.coords = {
+                    lng : body.coords[0],
+                    lat : body.coords[1]
+                };
+                // Turning the map static
+                data.coords = 'iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15936.768750392297!2d-60.02027928829196!3d-3.043106171570461!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c1a1055f67251%3A0x9ae77ab416b67309!2sHappy%20Day%20Futebol%20Society!5e0!3m2!1spt-PT!2sbr!4v1587870062455!5m2!1spt-PT!2sbr" width="100%" height="270" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"';
+                callback(req, res, data);
+            } else {
+                showError(req, res, statusCode);
+            }
+        }
+    )
 };
 
 //------------------------------- Location List --------------------------------
@@ -102,7 +128,7 @@ const homelist = (req, res) => {
     )
 };
 
-//------------------------------- Local Info --------------------------------
+//------------------------------- Local Info/ Details page --------------------------------
 // Moving contents of the locationInfo into an external function
 const renderDetailPage = (req, res, location) => {
     res.render('location-info', {
@@ -120,42 +146,53 @@ const renderDetailPage = (req, res, location) => {
 
 // GET 'Location info' page
 const locationInfo = (req, res) => {
-    const path = `/api/locations/${req.params.locationid}`;
-    const requestOptions = {
-        url: `${apiOptions.server}${path}`,
-        method: 'GET',
-        json: {}
-    };
-    request(
-        requestOptions, 
-        (err, {statusCode}, body) => {
-        let data = body;
-        if (statusCode === 200) {
-            data.coords = {
-                lng: body.coords[0],
-                lat: body.coords[1]
-            };
-            // Turning the map static
-            data.coords = 'iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15936.768750392297!2d-60.02027928829196!3d-3.043106171570461!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c1a1055f67251%3A0x9ae77ab416b67309!2sHappy%20Day%20Futebol%20Society!5e0!3m2!1spt-PT!2sbr!4v1587870062455!5m2!1spt-PT!2sbr" width="100%" height="270" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"';
-            renderDetailPage(req, res, data);    
-        } else {
-            showError(req, res, statusCode);
-            };
-        }
-    );
-    
+    getLocationInfo(req, res, 
+        (req, res, responseData) => renderDetailPage(req, res, responseData)
+        );
 };
 
 //------------------------------- Reviews --------------------------------
+const renderReviewForm = (req, res, {name}) => {
+    res.render('location-review-form',
+      {
+        title: `Review ${name} on Loc8r` ,
+        pageHeader: { title: `Review ${name}` },
+        error: req.query.err
+      }
+    );
+  };
+
 // GET 'Add review' page
 const addReview = (req, res) => {
-    res.render('location-review-form', {
-        title: 'Review Stacups on Loc8r',
-        pageHeader: 'Review Starcups'
-    });       
+    getLocationInfo(req, res,
+      (req, res, responseData) => renderReviewForm(req, res, responseData)
+    );
+  };
+  
+const doAddReview = (req, res) => {
+    const locationid = req.params.locationid;
+    const path = `/api/locations/${locationid}/reviews`;
+    const postdata = {
+        author: req.body.name,
+        rating: parseInt(req.body.rating, 10),
+        reviewText:req.body.review
+    };
+    const requestOptions = {
+        url: `${apiOptions.server}${path}`,
+        method: 'POST',
+        json: postdata
+    };
+    request (
+        requestOptions,
+        (err, {statusCode}, body) => {
+            if (statusCode === 201) {
+                res.redirect(`/location/${locationid}`);
+            } else {
+                showError(req, res, statusCode);
+            }
+        }
+    )
 };
-
-const doAddReview = (req, res) => { };
 
 module.exports = {
     homelist,

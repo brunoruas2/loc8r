@@ -6,10 +6,30 @@ const apiOptions = {
     server: 'http://localhost:3000'
   };
   if (process.env.NODE_ENV === 'web') {
-    apiOptions.server = 'https://stormy-eyrie-13476.herokuapp.com/';
+    apiOptions.server = 'http://localhost:5000'; 
+    // apiOptions.server = 'https://stormy-eyrie-13476.herokuapp.com/';
   }
 
 console.log("app_server connected to -> " + apiOptions.server)
+
+//------------------------------- Dealing with errors --------------------------------
+const showError = (req, res, status) => {
+    let title = '';
+    let content = '';
+    if (status === 404) {
+        title = '404, page not found';
+        content = 'Oh dear. Looks like you can\'t find this page. Sorry :( ';
+    } else {
+        title = `${status}, somethin'g gone wrong`;
+        content = 'Something, somewhere, has gone just a little bit wrong.'
+    }
+    res.status(status);
+
+    res.render('generic-text', {
+        title,
+        content
+    });
+};
 
 //------------------------------- Location List --------------------------------
 // Modifying data before displayint: distances
@@ -106,15 +126,21 @@ const locationInfo = (req, res) => {
         method: 'GET',
         json: {}
     };
-    request(requestOptions, (err, response, body) => {
-        const data = body;
-        data.coords = {
-            lng: body.coords[0],
-            lat: body.coords[1]
-        };
-        // Turning the map static
-        data.coords = 'iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15936.768750392297!2d-60.02027928829196!3d-3.043106171570461!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c1a1055f67251%3A0x9ae77ab416b67309!2sHappy%20Day%20Futebol%20Society!5e0!3m2!1spt-PT!2sbr!4v1587870062455!5m2!1spt-PT!2sbr" width="100%" height="270" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"';
-        renderDetailPage(req, res, data);
+    request(
+        requestOptions, 
+        (err, {statusCode}, body) => {
+        let data = body;
+        if (statusCode === 200) {
+            data.coords = {
+                lng: body.coords[0],
+                lat: body.coords[1]
+            };
+            // Turning the map static
+            data.coords = 'iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15936.768750392297!2d-60.02027928829196!3d-3.043106171570461!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c1a1055f67251%3A0x9ae77ab416b67309!2sHappy%20Day%20Futebol%20Society!5e0!3m2!1spt-PT!2sbr!4v1587870062455!5m2!1spt-PT!2sbr" width="100%" height="270" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"';
+            renderDetailPage(req, res, data);    
+        } else {
+            showError(req, res, statusCode);
+            };
         }
     );
     
@@ -129,8 +155,11 @@ const addReview = (req, res) => {
     });       
 };
 
+const doAddReview = (req, res) => { };
+
 module.exports = {
     homelist,
     locationInfo,
-    addReview
+    addReview,
+    doAddReview
 };
